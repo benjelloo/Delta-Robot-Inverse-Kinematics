@@ -11,7 +11,7 @@ class BotParams:
     end_effector_radius: float =0.14
     height: float=2 # from the ground to the servo
 
-def inverse_kinematics(x,y,z):
+def angle_calc(x,y,z):
     # [0,0,0] is defined to be the centre of the baseplate
     forearm_endeff_point = [x,y+BotParams.end_effector_radius,z]
     bicep_baseplate_point = [0,BotParams.base_radius,0]
@@ -28,11 +28,20 @@ def inverse_kinematics(x,y,z):
     # (y-forearm_endeff_point_y)^2+(z-forearm_endeff_point_z)^2=forearm_proj^2
     # solve for y,z!
     yj,zj = fsolve(circle_intersect,(BotParams.base_radius,0),(forearm_endeff_point,bicep_baseplate_point,forearm_proj))
-    print(circle_intersect((yj,zj),forearm_endeff_point,bicep_baseplate_point,forearm_proj))
     print(yj,zj)
     angle = math.atan(zj/(yj-BotParams.base_radius))*180/math.pi
     return angle
 
+def inverse_kinematics(x,y,z):
+    angles = []
+    angles.append(angle_calc(x,y,z))
+    x1=x*math.cos(2/3*math.pi)+y*math.sin(2/3*math.pi)
+    y1=-1*x*math.sin(2/3*math.pi)+y*math.cos(2/3*math.pi)
+    angles.append(angle_calc(x1,y1,z))
+    x2=x*math.cos(-2/3*math.pi)+y*math.sin(-2/3*math.pi)
+    y2=-1*x*math.sin(-2/3*math.pi)+y*math.cos(-2/3*math.pi)
+    angles.append(angle_calc(x2,y2,z))
+    return angles
 def circle_intersect(p,forearm_endeff_point,bicep_baseplate_point,forearm_proj):
     y,z=p
     return((y-bicep_baseplate_point[1])**2+(z-bicep_baseplate_point[2])**2-BotParams.bicep_length**2,
