@@ -32,6 +32,7 @@ def angle_calc(x,y,z):
     angle = math.atan(zj/(yj-BotParams.base_radius))*180/math.pi
     return angle
 
+# calculate an angle for each arm, rotate reference frame by +/- 120 degrees for the other two arms to simplify calcs
 def inverse_kinematics(x,y,z):
     angles = []
     angles.append(angle_calc(x,y,z))
@@ -42,10 +43,11 @@ def inverse_kinematics(x,y,z):
     y2=-1*x*math.sin(-2/3*math.pi)+y*math.cos(-2/3*math.pi)
     angles.append(angle_calc(x2,y2,z))
     return angles
+
 def circle_intersect(p,forearm_endeff_point,bicep_baseplate_point,forearm_proj):
     y,z=p
     return((y-bicep_baseplate_point[1])**2+(z-bicep_baseplate_point[2])**2-BotParams.bicep_length**2,
             (y-forearm_endeff_point[1])**2+(z-forearm_endeff_point[2])**2-forearm_proj**2)
 
-print(inverse_kinematics(0,0.05,-0.01))
+print(inverse_kinematics(0,0,-0.6))
 
